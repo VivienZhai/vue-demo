@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.loushang.framework.dict.dao.DictMapper">
+	<resultMap type="org.loushang.framework.dict.data.Dict" id="dictMap">
+	    <result property="code" column="dict_code"/>
+	    <result property="name" column="dict_name"/>
+	    <result property="setMan" column="set_man"/>
+	    <result property="setTime" column="set_time"/>
+	    <result property="note" column="note"/>
+	    <result property="inUse" column="in_use"/>
+	</resultMap>
+
+	<select id="getDictById" parameterType="string" resultMap="dictMap">
+	SELECT
+	  dict_code,
+	  dict_name,
+	  set_man,
+	  set_time,
+	  note,
+	  in_use
+	FROM
+	  pub_dict
+	WHERE
+	  dict_code = #{_parameter}
+	</select>
+
+	<select id="listDict" parameterType="map" resultMap="dictMap">
+	SELECT
+	  dict_code,
+	  dict_name,
+	  set_man,
+	  set_time,
+	  note,
+	  in_use
+	FROM
+	  pub_dict
+	  <where>
+	    <if test="inUse != null">
+	    in_use = #{inUse}
+	    </if>
+	    <if test="name != null">
+	      <bind name="fuzzyName" value="'%' + name + '%'"/>
+	      AND dict_name LIKE #{fuzzyName}
+	    </if>
+	  </where>
+	</select>
+	
+	<insert id="addDict" parameterType="org.loushang.framework.dict.data.Dict">
+	INSERT INTO
+	  pub_dict
+	(
+	  dict_code,
+	  dict_name,
+	  set_man,
+	  set_time,
+	  note,
+	  in_use
+	) VALUES (
+	  #{code},
+	  #{name},
+	  #{setMan},
+	  #{setTime},
+	  #{note},
+	  #{inUse}
+	)
+	</insert>
+
+	<delete id="removeDict" parameterType="string">
+	DELETE FROM
+	  pub_dict
+	WHERE
+	  dict_code = #{_parameter}
+	</delete>
+	
+	<delete id="batchRemoveDict" parameterType="string">
+	DELETE FROM
+	  pub_dict
+	WHERE
+	  dict_code
+	IN
+	  <foreach collection="array" open="(" close=")" separator="," item="item">
+	  #{item}
+	  </foreach>
+	</delete>
+
+	<update id="updateDict" parameterType="org.loushang.framework.dict.data.Dict">
+	UPDATE
+	  pub_dict
+	  <set>
+	    <if test="name != null">
+	    dict_name = #{name},
+	    </if>
+	    <if test="setMan != null">
+	    set_man = #{setMan},
+	    </if>
+	    <if test="setTime != null">
+	    set_time = #{setTime},
+	    </if>
+	    <if test="note != null">
+	    note = #{note},
+	    </if>
+	    <if test="inUse != null">
+	    in_use = #{inUse}
+	    </if>
+	  </set>
+	  WHERE
+	    dict_code = #{code}
+	</update>
+</mapper>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.loushang.framework.dict.dao.DictItemMapper">
+	<resultMap type="org.loushang.framework.dict.data.DictItem" id="dictItemMap">
+	    <result property="code" column="item_code"/>
+	    <result property="value" column="item_value"/>
+	    <result property="parentCode" column="parent_code"/>
+	    <result property="dictCode" column="dict_code"/>
+	    <result property="sequence" column="xh"/>
+	    <result property="note" column="note"/>
+	    <result property="inUse" column="in_use"/>
+	</resultMap>
+
+	<select id="getItem" resultMap="dictItemMap">
+	SELECT
+	  item_code,
+	  dict_code,
+	  item_value,
+	  xh,
+	  parent_code,
+	  note,
+	  in_use
+	FROM
+	  pub_dict_item
+	WHERE
+	  dict_code = #{arg0}
+	AND
+	  item_code = #{arg1}
+	</select>
+
+	<select id="listItems" parameterType="map" resultMap="dictItemMap">
+	SELECT
+	  item_code,
+	  dict_code,
+	  item_value,
+	  xh,
+	  parent_code,
+	  note,
+	  in_use
+	FROM
+	  pub_dict_item
+	  <where>
+	    <if test="dictCode != null">
+	    dict_code = #{dictCode}
+	    </if>
+	    <if test="parentCode != null and parentCode != ''">
+	    AND parent_code = #{parentCode}
+	    </if>
+	  </where>
+	ORDER BY xh ASC
+	</select>
+	
+	<insert id="addItem" parameterType="org.loushang.framework.dict.data.DictItem">
+	INSERT INTO
+	  pub_dict_item
+	(
+	  item_code,
+	  dict_code,
+	  item_value,
+	  xh,
+	  parent_code,
+	  note,
+	  in_use
+	) VALUES (
+	  #{code},
+	  #{dictCode},
+	  #{value},
+	  #{sequence},
+	  #{parentCode},
+	  #{note},
+	  #{inUse}
+	)
+	</insert>
+
+	<delete id="removeItem">
+	DELETE FROM 
+	  pub_dict_item 
+	WHERE
+	  dict_code = #{arg0}
+	AND 
+	  item_code = #{arg1}
+	</delete>
+	
+	<delete id="batchRemoveItem">
+	DELETE FROM
+	  pub_dict_item
+	WHERE
+	  dict_code = #{arg0}
+	AND
+	  item_code 
+	IN 
+	  <foreach collection="arg1" open="(" separator="," item="item" close=")">
+	  #{item}
+	  </foreach>
+	</delete>
+
+	<update id="updateItem" parameterType="org.loushang.framework.dict.data.DictItem">
+	UPDATE
+	  pub_dict_item
+	  <set>
+	    <if test="value != null">
+	    item_value = #{value},
+	    </if>
+	    <if test="sequence != null">
+	    xh = #{sequence},
+	    </if>
+	    <if test="note != null">
+	    note = #{note},
+	    </if>
+	    <if test="inUse != null">
+	    in_use = #{inUse}
+	    </if>
+	  </set>
+	  WHERE
+	    item_code = #{code}
+	</update>
+</mapper>

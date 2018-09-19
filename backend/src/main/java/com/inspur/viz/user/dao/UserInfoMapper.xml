@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspur.viz.user.dao.UserInfoMapper">
+	<resultMap type="com.inspur.viz.user.data.UserInfo" id="userInfoMap">
+		<id property="userId" column="user_id" />
+		<result property="userName" column="user_name" />
+		<result property="password" column="password"/>
+		<result property="accountStatus" column="account_status" />
+		<result property="isSys" column="is_sys" />
+		<result property="createTime" column="create_time" />
+		<result property="lockTime" column="lock_time" />
+		<result property="expiredTime" column="expired_time" />
+		<result property="pwdUptTime" column="pwd_upt_time" />
+		<result property="pwdTime" column="pwd_time" />
+	</resultMap>
+
+	<select id="getUserInfoById" parameterType="string" resultMap="userInfoMap">
+	SELECT
+		user_id,
+		user_name,
+		password,
+		account_status,
+		is_sys,
+		create_time,
+		lock_time,
+		expired_time,
+		pwd_upt_time,
+		pwd_time
+	FROM
+		pub_users
+	WHERE
+		user_id = #{_parameter}
+	</select>
+</mapper>

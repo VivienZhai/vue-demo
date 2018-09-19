@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspur.viz.manage.connection.dao.ConnectionMapper">
+	<resultMap type="com.inspur.viz.model.DataConnection" id="dataConnectionMap">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="dbClass" column="db_class" />
+		<result property="server" column="server" />
+		<result property="port" column="port" />
+		<result property="username" column="username" />
+		<result property="password" column="password" />
+		<result property="dbName" column="db_name" />
+		<result property="tableName" column="table_name" />
+		<result property="ownerId" column="owner_id" />
+		<result property="createdAt" column="created_at" />
+		<result property="updatedAt" column="updated_at" />
+		<result property="description" column="description" />
+		<result property="isActive" column="is_active" />
+		<result property="schema" column="schema_json" />
+	</resultMap>
+
+	<select id="getDataConnection" parameterType="string" resultMap="dataConnectionMap">
+	SELECT
+		id,
+		name,
+		db_class,
+		server,
+		port,
+		username,
+		password,
+		db_name,
+		table_name,
+		owner_id,
+		created_at,
+		updated_at,
+		description,
+		is_active,
+	  	schema_json
+	FROM
+		data_connections
+	WHERE
+		id = #{_parameter}
+	</select>
+
+	<select id="listDataConnection" parameterType="map" resultMap="dataConnectionMap">
+	SELECT
+		id,
+		name,
+		db_class,
+		server,
+		port,
+		username,
+		password,
+		db_name,
+		table_name,
+		owner_id,
+		created_at,
+		updated_at,
+		description,
+		is_active,
+		schema_json
+	FROM
+		data_connections
+		<where>
+			<if test="name != null and name !='' ">
+				name = #{name}
+			</if>
+			<if test="fuzzyName != null and fuzzyName !='' ">
+				<bind name="namePattern" value="'%' + fuzzyName + '%'" />
+				AND name LIKE #{namePattern}
+			</if>
+			<if test="ownerId != null and ownerId != ''">
+				AND owner_id = #{ownerId}
+			</if>
+			<if test="dbName != null and dbName != ''">
+				AND db_name = #{dbName}
+			</if>
+			<if test="dbClass != null">
+				AND db_class IN
+				<foreach collection="dbClass" open="(" close=")" separator=","
+					item="item">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		<choose>
+			<when test="orderfield != null and orderfield != ''">
+				ORDER BY ${orderfield}
+				<if test="orderdir != null and orderdir != ''">
+					<choose>
+						<when test="orderdir != null and order != ''">
+							${orderdir}
+						</when>
+						<otherwise>DESC</otherwise>
+					</choose>
+				</if>
+			</when>
+			<otherwise>
+			ORDER BY created_at DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="addConnection" parameterType="com.inspur.viz.model.DataConnection">
+	INSERT
+	INTO
+		data_connections
+	(
+		id,
+		name,
+		db_class,
+		server,
+		port,
+		username,
+		password,
+		db_name,
+		table_name,
+		owner_id,
+		created_at,
+		updated_at,
+		description,
+		is_active,
+	  	schema_json
+	) VALUES (
+		#{id},
+		#{name},
+		#{dbClass},
+		#{server},
+		#{port},
+		#{username},
+		#{password},
+		#{dbName},
+		#{tableName},
+		#{ownerId},
+		#{createdAt},
+		#{updatedAt},
+		#{description},
+		#{isActive},
+	  	#{schema}
+	)
+	</insert>
+
+	<delete id="removeConnection" parameterType="string">
+	DELETE
+	FROM
+		data_connections
+	WHERE
+		id = #{_parameter}
+	</delete>
+
+	<update id="updateConnection" parameterType="com.inspur.viz.model.DataConnection">
+	UPDATE
+		data_connections
+	    <set>
+			<if test="name != null">
+			name = #{name},
+			</if>
+			<if test="dbClass != null">
+			db_class = #{dbClass},
+			</if>
+			<if test="server != null">
+			server = #{server},
+			</if>
+			<if test="port != null">
+			port = #{port},
+			</if>
+			<if test="username != null">
+			username = #{username},
+			</if>
+			<if test="password != null">
+			password = #{password},
+			</if>
+			<if test="dbName != null">
+			db_name = #{dbName},
+			</if>
+			<if test="tableName != null">
+			table_name = #{tableName},
+			</if>
+			<if test="ownerId != null">
+			owner_id = #{ownerId},
+			</if>
+			<if test="createdAt != null">
+			created_at = #{createdAt},
+			</if>
+			<if test="updatedAt != null">
+			updated_at = #{updatedAt},
+			</if>
+			<if test="description != null">
+			description = #{description},
+			</if>
+			<if test="isActive != null">
+			is_active = #{isActive}
+			</if>
+			<if test="schema != null">
+	    	schema_json = #{schema}
+	   		</if>
+		</set>
+	WHERE
+		id = #{id}
+	</update>
+</mapper>
